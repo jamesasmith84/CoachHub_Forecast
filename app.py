@@ -24,7 +24,7 @@ selected_strengths = st.sidebar.multiselect("Model Strength", model_strengths, d
 # Load Excel data
 @st.cache_data
 def load_data(sheet_name):
-    return pd.read_excel("CoachHub_Case_Study_Forecast_Example.xlsx", sheet_name=sheet_name)
+    return pd.read_excel("CoachHub Case Study Forecast Example.xlsx", sheet_name=sheet_name)
 
 sheet = "Forecast Model A - Data" if model_option == "Model A" else "Forecast Model B - Data"
 data = load_data(sheet)
