@@ -28,6 +28,12 @@ def load_data(sheet_name):
 sheet = "Forecast Model A - Data" if "Model A" in model_option else "Forecast Model B - Data"
 data = load_data(sheet)
 
+# Ensure 'Quarter' column exists
+if "Quarter" not in data.columns and "Close Date" in data.columns:
+    data["Close Date"] = pd.to_datetime(data["Close Date"], errors='coerce')
+    data["Quarter"] = data["Close Date"].dt.to_period("Q").astype(str)
+
+
 # Apply filters
 data = data[
     (data["Model Weighting"] >= confidence_threshold) &
