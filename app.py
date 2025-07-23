@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Page setup
 st.set_page_config(page_title="CoachHub Forecast Model", layout="wide")
-st.markdown("<div style='text-align: center'><img src='logo.png' width='300'></div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center'><img src='CoachHub-Logo-Color-Positive-1-e1583424171362.png' width='300'></div>", unsafe_allow_html=True)
 
 st.title("CoachHub Forecast Model")
 
@@ -14,7 +14,7 @@ st.sidebar.header("Filters")
 currency_symbol_map = {"USD ($)": "$", "EUR (€)": "€", "GBP (£)": "£"}
 currency = st.sidebar.selectbox("Select Currency", options=list(currency_symbol_map.keys()))
 currency_symbol = currency_symbol_map[currency]
-model_option = st.sidebar.radio("Select Forecast Model", ["Model A - Balanced", "Model B - Probability/Forecast Category Weighted"])
+model_option = st.radio("Select Forecast Model", ["Model A - Balanced", "Model B - Probability/Forecast Category Weighted"], horizontal=True)
 confidence_threshold = st.sidebar.slider("Minimum Model Confidence", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 forecast_categories = ["Pipeline", "Best Case", "Probable", "Commit"]
 selected_categories = st.sidebar.multiselect("Forecast Categories", forecast_categories, default=forecast_categories)
@@ -70,7 +70,7 @@ with col3:
 st.subheader("Forecast Value by Category and Quarter")
 data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(str)
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
-st.line_chart(cat_qtr.T)
+st.bar_chart(cat_qtr.T)
 
 # Potential vs Forecast by Category + % Line (revised)
 st.subheader("Potential Amount vs Model Amount")
