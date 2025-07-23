@@ -58,7 +58,7 @@ else:
 st.subheader("Summary Metrics")
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Opportunities", len(data))
-col2.metric("Total Pipeline Value", f"{currency_symbol}{total_potential:,.0f}")
+col2.metric("Total Potential Amount", f"{currency_symbol}{total_potential:,.0f}")
 col3.metric("Model Amount", f"{currency_symbol}{total_model:,.0f}")
 
 # Forecast by Category and Quarter
