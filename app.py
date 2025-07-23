@@ -41,8 +41,7 @@ insights = []
 total_potential = data["Potential Amount"].sum()
 total_model = data["Model Amount"].sum()
 if total_model < total_potential * 0.5:
-    insights.append("⚠️ Model Amount is significantly lower than the Total Potential Amount — consider reviewing weighting factors.")
-if data["Model Weighting"].max() > 0.8:
+    if data["Model Weighting"].max() > 0.8:
     insights.append("✅ Some deals show high model confidence — these may be strong candidates for commit.")
 if data["Forecast Category"].str.contains("Pipeline").sum() > len(data) / 2:
     insights.append("🔍 Majority of opportunities are still in pipeline — might be early in the sales cycle.")
@@ -79,10 +78,10 @@ ax.set_xticklabels(quarters, rotation=45)
 ax.set_ylabel("Model Amount (in thousands)")
 
 # Add total opportunity count per quarter on secondary axis
-quarter_counts = data["Quarter"].value_counts().reindex(quarters).fillna(0)
+quarter_totals = data.groupby("Quarter")["Model Amount"].sum().reindex(quarters).fillna(0).div(1000)
 ax2 = ax.twinx()
-ax2.plot(x + bar_width, quarter_counts.values, color='red', marker='o', label="Opportunity Count")
-ax2.set_ylabel("Opportunity Count")
+ax2.plot(x + bar_width, quarter_totals.values, color='red', marker='o', label="Total Model Amount")
+ax2.set_ylabel("Total Model Amount (in thousands)")
 ax2.legend(loc="upper left")
 
 ax.legend(title="Forecast Category")
@@ -129,13 +128,3 @@ for col in percent_cols:
 data["Potential Amount"] = data["Potential Amount"].apply(lambda x: f"{currency_symbol}{x:,.0f}")
 data["Model Amount"] = data["Model Amount"].apply(lambda x: f"{currency_symbol}{x:,.0f}")
 st.dataframe(data)
-
-# Line chart: Opportunity Count per Quarter
-st.subheader("Opportunity Count by Quarter")
-quarter_counts = data["Quarter"].value_counts().sort_index()
-fig_line, ax_line = plt.subplots(figsize=(8, 3))
-ax_line.plot(quarter_counts.index, quarter_counts.values, marker='o')
-ax_line.set_ylabel("Opportunity Count")
-ax_line.set_xlabel("Quarter")
-ax_line.set_title("Total Opportunities per Quarter")
-st.pyplot(fig_line)
