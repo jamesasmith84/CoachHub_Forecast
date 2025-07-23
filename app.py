@@ -72,18 +72,20 @@ data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(st
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
 st.bar_chart(cat_qtr.T)
 
-# Potential vs Forecast by Category + % Line
-st.subheader("Potential vs Forecast by Category with % Forecast Accuracy")
+# Potential vs Forecast by Category + % Line (revised)
+st.subheader("Potential vs Forecast by Category with Model % vs Total Possible Amount")
 cat_comp = data.groupby("Forecast Category")[["Potential Amount", "Model Amount"]].sum()
+cat_comp = cat_comp.loc[["Pipeline", "Best Case", "Probable", "Commit"]]  # enforce order
 cat_comp = cat_comp[cat_comp["Potential Amount"] > 0]  # avoid div by 0
 pct_line = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).clip(upper=999).round(1)
 
-fig, ax1 = plt.subplots()
-cat_comp.plot(kind='bar', ax=ax1)
-ax1.set_ylabel("Amount")
+fig, ax1 = plt.subplots(figsize=(8, 4))
+cat_comp_div = cat_comp.div(1000)
+cat_comp_div.plot(kind='bar', ax=ax1, width=0.6)
+ax1.set_ylabel("Amount (in thousands)")
 ax2 = ax1.twinx()
-ax2.plot(cat_comp.index, pct_line, color='red', marker='o', label="% Accuracy")
-ax2.set_ylabel("% Forecast Accuracy")
+ax2.plot(cat_comp.index, pct_line, color='red', marker='o', label="Model % vs Total")
+ax2.set_ylabel("Model % vs Total")
 ax2.set_ylim(0, 120)
 ax2.legend(loc="upper left")
 st.pyplot(fig)
