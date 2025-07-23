@@ -62,7 +62,7 @@ col2.metric("Total Pipeline Value", f"{currency_symbol}{total_potential:,.0f}")
 col3.metric("Model Amount", f"{currency_symbol}{total_model:,.0f}")
 
 # Forecast by Category and Quarter
-st.subheader("Model Forecast By Category & Quarter")
+st.subheader("Model Amount By Category & Quarter")
 data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(str)
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
 cat_qtr = cat_qtr.reindex(["Pipeline", "Best Case", "Probable", "Commit"]).div(1000)
@@ -91,7 +91,7 @@ fig2, ax1 = plt.subplots(figsize=(8, 4))
 cat_comp_div.plot(kind='bar', ax=ax1, width=0.6)
 for container in ax1.containers:
     ax1.bar_label(container, fmt='%.0f', label_type='edge', fontsize=8, padding=3)
-ax1.set_ylabel("Model Amount (in thousands)")
+ax1.set_ylabel("Amount (in thousands)")
 ax2 = ax1.twinx()
 ax2.plot(cat_comp.index, pct_line, color='red', marker='o', label="Model % vs Total")
 for i, v in enumerate(pct_line):
@@ -108,7 +108,7 @@ fig3, ax3 = plt.subplots(figsize=(10, 4))
 rep_cat.plot(kind='bar', stacked=True, ax=ax3)
 ax3.set_ylabel("Model Amount (in thousands)")
 ax3.set_xlabel("Opportunity Owner")
-ax3.set_title("Forecast by Sales Rep and Category")
+ax3.set_title("Model Amount by Sales Rep and Category")
 st.pyplot(fig3)
 
 # Format and display data table
