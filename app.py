@@ -14,7 +14,7 @@ st.sidebar.header("Filters")
 currency_symbol_map = {"USD ($)": "$", "EUR (€)": "€", "GBP (£)": "£"}
 currency = st.sidebar.selectbox("Select Currency", options=list(currency_symbol_map.keys()))
 currency_symbol = currency_symbol_map[currency]
-model_option = st.sidebar.radio("Select Forecast Model", ["Model A", "Model B"])
+model_option = st.sidebar.radio("Select Forecast Model", ["Model A - Balanced", "Model B - Probability/Forecast Category Weighted"])
 confidence_threshold = st.sidebar.slider("Minimum Model Confidence", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 forecast_categories = ["Pipeline", "Best Case", "Probable", "Commit"]
 selected_categories = st.sidebar.multiselect("Forecast Categories", forecast_categories, default=forecast_categories)
@@ -26,7 +26,7 @@ selected_strengths = st.sidebar.multiselect("Model Strength", model_strengths, d
 def load_data(sheet_name):
     return pd.read_excel("CoachHub Case Study Forecast Example.xlsx", sheet_name=sheet_name)
 
-sheet = "Forecast Model A - Data" if model_option == "Model A" else "Forecast Model B - Data"
+sheet = "Forecast Model A - Data" if "Model A" in model_option else "Forecast Model B - Data"
 data = load_data(sheet)
 
 # Filters
@@ -70,10 +70,10 @@ with col3:
 st.subheader("Forecast Value by Category and Quarter")
 data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(str)
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
-st.bar_chart(cat_qtr.T)
+st.line_chart(cat_qtr.T)
 
 # Potential vs Forecast by Category + % Line (revised)
-st.subheader("Potential vs Forecast by Category with Model % vs Total Possible Amount")
+st.subheader("Potential Amount vs Model Amount")
 cat_comp = data.groupby("Forecast Category")[["Potential Amount", "Model Amount"]].sum()
 cat_comp = cat_comp.loc[["Pipeline", "Best Case", "Probable", "Commit"]]  # enforce order
 cat_comp = cat_comp[cat_comp["Potential Amount"] > 0]  # avoid div by 0
@@ -85,6 +85,8 @@ cat_comp_div.plot(kind='bar', ax=ax1, width=0.6)
 ax1.set_ylabel("Amount (in thousands)")
 ax2 = ax1.twinx()
 ax2.plot(cat_comp.index, pct_line, color='red', marker='o', label="Model % vs Total")
+for i, v in enumerate(pct_line):
+    ax2.text(i, v + 2, f"{v:.1f}%", ha="center", va="bottom", color="red", fontsize=8)
 ax2.set_ylabel("Model % vs Total")
 ax2.set_ylim(0, 120)
 ax2.legend(loc="upper left")
