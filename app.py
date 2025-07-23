@@ -65,7 +65,7 @@ col3.metric("Model Amount", f"{currency_symbol}{total_model:,.0f}")
 st.subheader("Model Amount By Category & Quarter")
 data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(str)
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
-cat_qtr = cat_qtr.reindex(["Pipeline", "Best Case", "Probable", "Commit"]).div(1000)
+cat_qtr = cat_qtr.reindex(["Pipeline", "Best Case", "Probable", "Commit"]).fillna(0).div(1000)
 quarters = cat_qtr.columns.tolist()
 categories = cat_qtr.index.tolist()
 bar_width = 0.15
@@ -83,7 +83,7 @@ st.pyplot(fig1)
 # Potential vs Forecast by Category with % overlay
 st.subheader("Potential Amount vs Model Amount")
 cat_comp = data.groupby("Forecast Category")[["Potential Amount", "Model Amount"]].sum()
-cat_comp = cat_comp.loc[["Pipeline", "Best Case", "Probable", "Commit"]]
+cat_comp = cat_comp.reindex(["Pipeline", "Best Case", "Probable", "Commit"]).fillna(0)
 cat_comp = cat_comp[cat_comp["Potential Amount"] > 0]
 pct_line = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).clip(upper=999).round(1)
 cat_comp_div = cat_comp.div(1000)
