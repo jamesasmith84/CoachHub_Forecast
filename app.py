@@ -1,6 +1,7 @@
 
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Page setup
 st.set_page_config(page_title="CoachHub Forecast Model", layout="wide")
@@ -71,15 +72,20 @@ data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(st
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
 st.bar_chart(cat_qtr.T)
 
-# Potential vs Forecast by Category - side-by-side bars
-st.subheader("Potential vs Forecast by Category")
+# Potential vs Forecast by Category + % Line
+st.subheader("Potential vs Forecast by Category with % Forecast Accuracy")
 cat_comp = data.groupby("Forecast Category")[["Potential Amount", "Model Amount"]].sum()
-st.bar_chart(cat_comp)
+pct_line = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).round(1)
 
-# Line chart for % of Model Amount vs Potential
-st.subheader("Forecast Accuracy by Category")
-pct_chart = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).round(1).rename("% Forecast Accuracy")
-st.line_chart(pct_chart)
+fig, ax1 = plt.subplots()
+cat_comp.plot(kind='bar', ax=ax1)
+ax1.set_ylabel("Amount")
+ax2 = ax1.twinx()
+ax2.plot(cat_comp.index, pct_line, color='red', marker='o', label="% Accuracy")
+ax2.set_ylabel("% Forecast Accuracy")
+ax2.set_ylim(0, 120)
+ax2.legend(loc="upper left")
+st.pyplot(fig)
 
 # Forecast by Rep and Category (stacked)
 st.subheader("Forecast by Sales Rep and Category")
