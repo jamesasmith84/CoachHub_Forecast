@@ -41,6 +41,7 @@ st.subheader("AI Insights")
 insights = []
 total_potential = data["Potential Amount"].sum()
 total_model = data["Model Amount"].sum()
+
 if data["Model Weighting"].max() > 0.8:
     insights.append("✅ Some deals show high model confidence — these may be strong candidates for commit.")
 if data["Forecast Category"].str.contains("Pipeline").sum() > len(data) / 2:
@@ -63,3 +64,13 @@ for col in percent_cols:
 data["Potential Amount"] = data["Potential Amount"].apply(lambda x: f"{currency_symbol}{x:,.0f}")
 data["Model Amount"] = data["Model Amount"].apply(lambda x: f"{currency_symbol}{x:,.0f}")
 st.dataframe(data)
+
+# Line chart: Opportunity Count per Quarter
+st.subheader("Opportunity Count by Quarter")
+quarter_counts = data["Quarter"].value_counts().sort_index()
+fig_line, ax_line = plt.subplots(figsize=(8, 3))
+ax_line.plot(quarter_counts.index, quarter_counts.values, marker='o')
+ax_line.set_ylabel("Opportunity Count")
+ax_line.set_xlabel("Quarter")
+ax_line.set_title("Total Opportunities per Quarter")
+st.pyplot(fig_line)
