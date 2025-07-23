@@ -75,7 +75,8 @@ st.bar_chart(cat_qtr.T)
 # Potential vs Forecast by Category + % Line
 st.subheader("Potential vs Forecast by Category with % Forecast Accuracy")
 cat_comp = data.groupby("Forecast Category")[["Potential Amount", "Model Amount"]].sum()
-pct_line = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).round(1)
+cat_comp = cat_comp[cat_comp["Potential Amount"] > 0]  # avoid div by 0
+pct_line = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).clip(upper=999).round(1)
 
 fig, ax1 = plt.subplots()
 cat_comp.plot(kind='bar', ax=ax1)
