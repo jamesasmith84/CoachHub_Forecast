@@ -70,7 +70,25 @@ with col3:
 st.subheader("Forecast Value by Category and Quarter")
 data["Quarter"] = pd.to_datetime(data["Close Date"]).dt.to_period("Q").astype(str)
 cat_qtr = data.groupby(["Forecast Category", "Quarter"])["Model Amount"].sum().unstack().fillna(0)
-st.bar_chart(cat_qtr.T)
+
+# Grouped bar chart by quarter and forecast category
+import numpy as np
+fig1, ax = plt.subplots(figsize=(10, 5))
+quarters = cat_qtr.columns.tolist()
+categories = cat_qtr.index.tolist()
+bar_width = 0.15
+x = np.arange(len(quarters))
+
+for i, cat in enumerate(categories):
+    values = cat_qtr.loc[cat]
+    ax.bar(x + i * bar_width, values, width=bar_width, label=cat)
+
+ax.set_xticks(x + bar_width * (len(categories) - 1) / 2)
+ax.set_xticklabels(quarters, rotation=45)
+ax.set_ylabel("Model Amount")
+ax.legend(title="Forecast Category")
+st.pyplot(fig1)
+
 
 # Potential vs Forecast by Category + % Line (revised)
 st.subheader("Potential Amount vs Model Amount")
@@ -82,6 +100,8 @@ pct_line = (cat_comp["Model Amount"] / cat_comp["Potential Amount"] * 100).clip(
 fig, ax1 = plt.subplots(figsize=(8, 4))
 cat_comp_div = cat_comp.div(1000)
 cat_comp_div.plot(kind='bar', ax=ax1, width=0.6)
+for container in ax1.containers:
+    ax1.bar_label(container, fmt='%.0f', label_type='edge', fontsize=8, padding=3)
 ax1.set_ylabel("Amount (in thousands)")
 ax2 = ax1.twinx()
 ax2.plot(cat_comp.index, pct_line, color='red', marker='o', label="Model % vs Total")
@@ -95,7 +115,14 @@ st.pyplot(fig)
 # Forecast by Rep and Category (stacked)
 st.subheader("Forecast by Sales Rep and Category")
 rep_cat = data.pivot_table(index="Opportunity Owner", columns="Forecast Category", values="Model Amount", aggfunc="sum").fillna(0)
-st.bar_chart(rep_cat)
+
+fig3, ax3 = plt.subplots(figsize=(10, 4))
+rep_cat.plot(kind='bar', stacked=True, ax=ax3)
+ax3.set_ylabel("Model Amount")
+ax3.set_xlabel("Opportunity Owner")
+ax3.set_title("Forecast by Sales Rep and Category")
+st.pyplot(fig3)
+
 
 # Format table
 st.subheader("Opportunity Detail")
