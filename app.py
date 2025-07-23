@@ -41,7 +41,7 @@ insights = []
 total_potential = data["Potential Amount"].sum()
 total_model = data["Model Amount"].sum()
 if total_model < total_potential * 0.5:
-    insights.append("⚠️ Forecasted amount is significantly lower than the pipeline value — consider reviewing weighting factors.")
+    insights.append("⚠️ Model Amount is significantly lower than the Total Potential Amount — consider reviewing weighting factors.")
 if data["Model Weighting"].max() > 0.8:
     insights.append("✅ Some deals show high model confidence — these may be strong candidates for commit.")
 if data["Forecast Category"].str.contains("Pipeline").sum() > len(data) / 2:
@@ -52,7 +52,7 @@ if insights:
     for insight in insights:
         st.write(insight)
 else:
-    st.write("📈 No major anomalies detected. Forecast model looks balanced.")
+    st.write("📈 No major anomalies detected. Model Amount looks balanced.")
 
 # KPI Summary
 st.subheader("Summary Metrics")
@@ -77,6 +77,14 @@ for i, cat in enumerate(categories):
 ax.set_xticks(x + bar_width * (len(categories) - 1) / 2)
 ax.set_xticklabels(quarters, rotation=45)
 ax.set_ylabel("Model Amount (in thousands)")
+
+# Add total opportunity count per quarter on secondary axis
+quarter_counts = data["Quarter"].value_counts().reindex(quarters).fillna(0)
+ax2 = ax.twinx()
+ax2.plot(x + bar_width, quarter_counts.values, color='red', marker='o', label="Opportunity Count")
+ax2.set_ylabel("Opportunity Count")
+ax2.legend(loc="upper left")
+
 ax.legend(title="Forecast Category")
 st.pyplot(fig1)
 
