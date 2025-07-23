@@ -27,7 +27,6 @@ def load_data(sheet_name):
 
 sheet = "Forecast Model A - Data" if "Model A" in model_option else "Forecast Model B - Data"
 data = load_data(sheet)
-
 # Ensure 'Quarter' column exists
 if "Quarter" not in data.columns and "Close Date" in data.columns:
     data["Close Date"] = pd.to_datetime(data["Close Date"], errors='coerce')
@@ -71,12 +70,3 @@ data["Potential Amount"] = data["Potential Amount"].apply(lambda x: f"{currency_
 data["Model Amount"] = data["Model Amount"].apply(lambda x: f"{currency_symbol}{x:,.0f}")
 st.dataframe(data)
 
-# Line chart: Opportunity Count per Quarter
-st.subheader("Opportunity Count by Quarter")
-quarter_counts = data["Quarter"].value_counts().sort_index()
-fig_line, ax_line = plt.subplots(figsize=(8, 3))
-ax_line.plot(quarter_counts.index, quarter_counts.values, marker='o')
-ax_line.set_ylabel("Opportunity Count")
-ax_line.set_xlabel("Quarter")
-ax_line.set_title("Total Opportunities per Quarter")
-st.pyplot(fig_line)
