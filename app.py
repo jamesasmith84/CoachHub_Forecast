@@ -102,7 +102,7 @@ ax2.legend(loc="upper left")
 st.pyplot(fig2)
 
 # Forecast by Rep and Category
-st.subheader("Forecast by Sales Rep and Category")
+st.subheader("Model Amount by Sales Rep and Category")
 rep_cat = data.pivot_table(index="Opportunity Owner", columns="Forecast Category", values="Model Amount", aggfunc="sum").fillna(0).div(1000)
 fig3, ax3 = plt.subplots(figsize=(10, 4))
 rep_cat.plot(kind='bar', stacked=True, ax=ax3)
